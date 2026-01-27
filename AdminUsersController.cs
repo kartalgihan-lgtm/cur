@@ -26,10 +26,12 @@ public class AdminUsersController : ControllerBase
              .ToList()
              .Adapt<List<AdminAppUsersResponseDto>>();
 
-        var networkUsers = await userManager.GetUsersInRoleAsync(UsersSeeding.NetworkRole);
+        var networkUserIds = (await userManager.GetUsersInRoleAsync(UsersSeeding.NetworkRole))
+            .Select(networkUser => networkUser.Id)
+            .ToHashSet();
         foreach (var user in usersResponse)
         {
-            user.IsNetworkUser = networkUsers.FirstOrDefault(x => x.Id.Equals(user.Id)) != null;
+            user.IsNetworkUser = networkUserIds.Contains(user.Id);
         }
 
         return usersResponse;
