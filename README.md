@@ -63,6 +63,64 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
+## Windows (Visual Studio, no CMake)
+
+Use this if you are building directly in Visual Studio without CMake.
+
+### 1) Install OpenSSL (x64)
+
+**Recommended (vcpkg):**
+```powershell
+vcpkg install openssl:x64-windows
+```
+
+This installs headers and libraries under:
+`C:\vcpkg\installed\x64-windows\`
+
+### 2) Set the solution platform to x64
+
+In Visual Studio: **Build > Configuration Manager** and set
+**Active solution platform** to **x64**.
+
+### 3) Add include path
+
+Project Properties -> **C/C++** -> **General** ->
+**Additional Include Directories**:
+```
+C:\vcpkg\installed\x64-windows\include
+```
+
+### 4) Add library path
+
+Project Properties -> **Linker** -> **General** ->
+**Additional Library Directories**:
+```
+C:\vcpkg\installed\x64-windows\lib
+```
+
+### 5) Link the libraries
+
+Project Properties -> **Linker** -> **Input** ->
+**Additional Dependencies**:
+```
+libssl.lib
+libcrypto.lib
+Ws2_32.lib
+Crypt32.lib
+```
+
+If you see unresolved external symbols, also try adding `Advapi32.lib`.
+
+### 6) Runtime DLLs (if using dynamic libs)
+
+Copy the matching DLLs next to your `.exe`, or add their folder to `PATH`:
+```
+C:\vcpkg\installed\x64-windows\bin\libssl-3-x64.dll
+C:\vcpkg\installed\x64-windows\bin\libcrypto-3-x64.dll
+```
+
+For Debug builds, use `debug\bin`. Ensure the DLLs match x64.
+
 ## Alternative: Manual include/lib paths (not preferred)
 
 If you cannot use `find_package(OpenSSL)`, you can manually set include paths and
